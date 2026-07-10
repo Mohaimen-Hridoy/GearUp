@@ -707,6 +707,20 @@ Expected output:
 - Admin login uses `admin@gearup.com` and `Admin@12345`.
 - The app is running on the expected local port.
 
+### Success Response Pattern
+
+Successful requests usually look like this:
+
+```json
+{
+   "success": true,
+   "message": "...",
+   "data": {}
+}
+```
+
+The exact `data` shape changes by endpoint, but `success` should always be `true`.
+
 ### Main API Groups
 
 - `/api/auth`
