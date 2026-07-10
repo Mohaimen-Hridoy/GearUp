@@ -672,6 +672,22 @@ Expected output:
 | Provider | gear CRUD, rental status updates |
 | Admin | category create, user management, admin views |
 
+### End To End Checklist
+
+1. Seed the database.
+2. Login as admin.
+3. Register provider and customer.
+4. Create category.
+5. Create gear.
+6. Create rental.
+7. Confirm rental.
+8. Create payment.
+9. Confirm payment.
+10. Mark gear picked up.
+11. Mark gear returned.
+12. Create review.
+13. Verify admin views.
+
 ### Main API Groups
 
 - `/api/auth`
