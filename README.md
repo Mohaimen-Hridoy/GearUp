@@ -699,6 +699,14 @@ Expected output:
 | Payment create | `PAYMENT_ID`, `PAYMENT_INTENT_ID` |
 | Review create | no new id required for next step |
 
+### Environment Checklist
+
+- `DATABASE_URL` points to the database you are testing.
+- `JWT_SECRET` is set.
+- `npm run prisma:seed` has been executed.
+- Admin login uses `admin@gearup.com` and `Admin@12345`.
+- The app is running on the expected local port.
+
 ### Main API Groups
 
 - `/api/auth`
