@@ -729,6 +729,14 @@ The exact `data` shape changes by endpoint, but `success` should always be `true
 - `startDate` and `endDate` should be ISO strings.
 - Do not send a slug where an ID is required.
 
+### Submission Checklist
+
+- Confirm the API builds with `npm run build`.
+- Seed the database with `npm run prisma:seed`.
+- Verify the admin login works.
+- Run the full Thunder Client flow from auth to review.
+- Keep the live API URL and docs URL ready for submission.
+
 ### Main API Groups
 
 - `/api/auth`
