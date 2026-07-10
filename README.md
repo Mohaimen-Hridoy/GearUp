@@ -629,6 +629,14 @@ Expected output:
 - `404`: resource not found
 - `409`: duplicate or conflict
 
+### Thunder Client Troubleshooting
+
+- If admin login fails, rerun `npm run prisma:seed` and verify the `DATABASE_URL` points to the correct database.
+- If provider gear create fails with `Category not found`, use the category `id` from `POST /categories`, not the slug.
+- If gear detail requests fail with invalid id format, use the returned gear `id` exactly as saved.
+- If payment create fails, confirm the rental order first and make sure you are using the customer's token.
+- If review creation fails, return the gear first and then retry the review request.
+
 ### Main API Groups
 
 - `/api/auth`
