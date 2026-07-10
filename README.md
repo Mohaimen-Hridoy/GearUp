@@ -664,6 +664,14 @@ Expected output:
 | Admin | GET | `/admin/gear` |
 | Admin | GET | `/admin/rentals` |
 
+### Role Matrix
+
+| Role | What to test |
+|---|---|
+| Customer | rental creation, payment, review, own payment history |
+| Provider | gear CRUD, rental status updates |
+| Admin | category create, user management, admin views |
+
 ### Main API Groups
 
 - `/api/auth`
