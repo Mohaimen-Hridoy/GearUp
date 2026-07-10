@@ -737,6 +737,20 @@ The exact `data` shape changes by endpoint, but `success` should always be `true
 - Run the full Thunder Client flow from auth to review.
 - Keep the live API URL and docs URL ready for submission.
 
+### Final Testing Recap
+
+If everything passes in Thunder Client, the core GearUp flow is working:
+
+1. Admin login
+2. Category create
+3. Provider gear create
+4. Customer rental create
+5. Provider rental confirm
+6. Payment create and confirm
+7. Provider pickup and return updates
+8. Customer review
+9. Admin overview checks
+
 ### Main API Groups
 
 - `/api/auth`
