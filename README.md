@@ -184,19 +184,6 @@ OpenAPI JSON is available at:
 /api/docs
 ```
 
-### Bruno Testing
-
-The repository now includes a Bruno collection under `bruno/`.
-
-Use the `bruno/environments/local.bru` file with:
-
-```text
-baseUrl = http://localhost:5000/api
-```
-
-Open the `bruno/` folder in Bruno, select the `local` environment, then run the requests in order:
-login admin, register provider/customer, create category, create gear, create rental, create payment, confirm payment, mark returned, and create review.
-
 ### Main API Groups
 
 - `/api/auth`
