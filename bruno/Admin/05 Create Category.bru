@@ -1,0 +1,39 @@
+meta {
+  name: Create Category
+  type: http
+  seq: 5
+  tags: [admin, category]
+}
+
+post {
+  url: {{baseUrl}}/categories
+}
+
+headers {
+  content-type: application/json
+  Authorization: Bearer {{adminToken}}
+}
+
+script:pre-request {
+  const suffix = Date.now();
+  bru.setVar("categoryName", `Camping ${suffix}`);
+  bru.setVar("categorySlug", `camping-${suffix}`);
+}
+
+body {
+  {
+    "name": "{{categoryName}}",
+    "slug": "{{categorySlug}}"
+  }
+}
+
+script:post-response {
+  bru.setVar("categoryId", res.body.data.id);
+}
+
+tests {
+  test("should create category successfully", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.data.id).to.be.a("string");
+  });
+}

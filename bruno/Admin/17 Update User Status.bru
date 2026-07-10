@@ -1,0 +1,28 @@
+meta {
+  name: Update User Status
+  type: http
+  seq: 17
+  tags: [admin]
+}
+
+patch {
+  url: {{baseUrl}}/admin/users/{{customerId}}
+}
+
+headers {
+  content-type: application/json
+  Authorization: Bearer {{adminToken}}
+}
+
+body {
+  {
+    "status": "SUSPENDED"
+  }
+}
+
+tests {
+  test("should update user status", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.data.status).to.equal("SUSPENDED");
+  });
+}

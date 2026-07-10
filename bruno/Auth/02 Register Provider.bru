@@ -1,0 +1,42 @@
+meta {
+  name: Register Provider
+  type: http
+  seq: 2
+  tags: [auth, provider]
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+}
+
+headers {
+  content-type: application/json
+}
+
+script:pre-request {
+  const suffix = Date.now();
+  bru.setVar("providerEmail", `provider-${suffix}@gearup.test`);
+  bru.setVar("providerPassword", "Provider@12345");
+  bru.setVar("providerName", `Provider ${suffix}`);
+}
+
+body {
+  {
+    "name": "{{providerName}}",
+    "email": "{{providerEmail}}",
+    "password": "{{providerPassword}}",
+    "role": "PROVIDER"
+  }
+}
+
+script:post-response {
+  bru.setVar("providerToken", res.body.data.token);
+  bru.setVar("providerId", res.body.data.user.id);
+}
+
+tests {
+  test("should register provider successfully", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.data.token).to.be.a("string");
+  });
+}

@@ -1,0 +1,42 @@
+meta {
+  name: Register Customer
+  type: http
+  seq: 3
+  tags: [auth, customer]
+}
+
+post {
+  url: {{baseUrl}}/auth/register
+}
+
+headers {
+  content-type: application/json
+}
+
+script:pre-request {
+  const suffix = Date.now();
+  bru.setVar("customerEmail", `customer-${suffix}@gearup.test`);
+  bru.setVar("customerPassword", "Customer@12345");
+  bru.setVar("customerName", `Customer ${suffix}`);
+}
+
+body {
+  {
+    "name": "{{customerName}}",
+    "email": "{{customerEmail}}",
+    "password": "{{customerPassword}}",
+    "role": "CUSTOMER"
+  }
+}
+
+script:post-response {
+  bru.setVar("customerToken", res.body.data.token);
+  bru.setVar("customerId", res.body.data.user.id);
+}
+
+tests {
+  test("should register customer successfully", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.data.token).to.be.a("string");
+  });
+}

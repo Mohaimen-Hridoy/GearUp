@@ -1,0 +1,33 @@
+meta {
+  name: Create Payment
+  type: http
+  seq: 11
+  tags: [payment, customer]
+}
+
+post {
+  url: {{baseUrl}}/payments/create
+}
+
+headers {
+  content-type: application/json
+  Authorization: Bearer {{customerToken}}
+}
+
+body {
+  {
+    "rentalOrderId": "{{rentalOrderId}}"
+  }
+}
+
+script:post-response {
+  bru.setVar("paymentId", res.body.data.payment.id);
+  bru.setVar("transactionId", res.body.data.payment.transactionId);
+}
+
+tests {
+  test("should create payment successfully", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.data.payment.id).to.be.a("string");
+  });
+}

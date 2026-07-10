@@ -1,0 +1,21 @@
+meta {
+  name: Get Rentals
+  type: http
+  seq: 10
+  tags: [rental, customer]
+}
+
+get {
+  url: {{baseUrl}}/rentals
+}
+
+headers {
+  Authorization: Bearer {{customerToken}}
+}
+
+tests {
+  test("should list customer rentals", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.success).to.equal(true);
+  });
+}

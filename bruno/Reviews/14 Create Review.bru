@@ -1,0 +1,30 @@
+meta {
+  name: Create Review
+  type: http
+  seq: 14
+  tags: [review, customer]
+}
+
+post {
+  url: {{baseUrl}}/reviews
+}
+
+headers {
+  content-type: application/json
+  Authorization: Bearer {{customerToken}}
+}
+
+body {
+  {
+    "gearItemId": "{{gearId}}",
+    "rating": 5,
+    "comment": "Great gear and smooth rental flow"
+  }
+}
+
+tests {
+  test("should create a review", function () {
+    expect(res.status).to.equal(201);
+    expect(res.body.data.rating).to.equal(5);
+  });
+}

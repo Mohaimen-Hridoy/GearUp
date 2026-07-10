@@ -1,0 +1,21 @@
+meta {
+  name: Get Payments
+  type: http
+  seq: 15
+  tags: [payment, customer]
+}
+
+get {
+  url: {{baseUrl}}/payments
+}
+
+headers {
+  Authorization: Bearer {{customerToken}}
+}
+
+tests {
+  test("should list customer payments", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.success).to.equal(true);
+  });
+}

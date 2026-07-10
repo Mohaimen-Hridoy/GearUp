@@ -1,0 +1,28 @@
+meta {
+  name: Confirm Payment
+  type: http
+  seq: 12
+  tags: [payment, customer]
+}
+
+post {
+  url: {{baseUrl}}/payments/confirm
+}
+
+headers {
+  content-type: application/json
+  Authorization: Bearer {{customerToken}}
+}
+
+body {
+  {
+    "rentalOrderId": "{{rentalOrderId}}"
+  }
+}
+
+tests {
+  test("should confirm payment successfully", function () {
+    expect(res.status).to.equal(200);
+    expect(res.body.data.status).to.equal("COMPLETED");
+  });
+}

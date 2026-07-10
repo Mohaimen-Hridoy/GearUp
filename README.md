@@ -123,3 +123,86 @@ Admin Password   : admin123
 > **Plagiarism** = 0 Marks. All work must be original.
 
 **Good luck! Build a rock-solid backend you're proud of.** 🚀
+
+---
+
+## ⚙️ GearUp Backend Starter (ID last digit 6)
+
+This repository now includes a complete starter backend for the **GearUp** variant with:
+- Express + TypeScript setup
+- Prisma schema (Users, Categories, GearItems, RentalOrders, Payments, Reviews)
+- JWT auth with role guards (Customer, Provider, Admin)
+- Validation + consistent error response format (`{ success, message, errorDetails }`)
+- Payment-ready endpoints (`/api/payments/create`, `/api/payments/confirm`)
+- OpenAPI docs endpoint (`/api/docs`)
+- Prisma seed script for admin credentials and starter categories
+
+### Quick Start
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Create env file:
+   ```bash
+   copy .env.example .env
+   ```
+3. Set your database and auth credentials in `.env`.
+4. Generate Prisma client:
+   ```bash
+   npm run prisma:generate
+   ```
+5. Run migration:
+   ```bash
+   npm run prisma:migrate
+   ```
+6. Start development server:
+   ```bash
+   npm run dev
+   ```
+
+### Seed Admin Credentials
+
+Run the seed script after setting your database connection:
+
+```bash
+npm run prisma:seed
+```
+
+Default seeded admin:
+
+```text
+Admin Email    : admin@gearup.com
+Admin Password  : Admin@12345
+```
+
+### API Docs
+
+OpenAPI JSON is available at:
+
+```text
+/api/docs
+```
+
+### Bruno Testing
+
+The repository now includes a Bruno collection under `bruno/`.
+
+Use the `bruno/environments/local.bru` file with:
+
+```text
+baseUrl = http://localhost:5000/api
+```
+
+Open the `bruno/` folder in Bruno, select the `local` environment, then run the requests in order:
+login admin, register provider/customer, create category, create gear, create rental, create payment, confirm payment, mark returned, and create review.
+
+### Main API Groups
+
+- `/api/auth`
+- `/api/categories`
+- `/api/gear`
+- `/api/rentals`
+- `/api/payments`
+- `/api/reviews`
+- `/api/admin`
