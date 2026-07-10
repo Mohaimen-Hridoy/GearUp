@@ -637,6 +637,33 @@ Expected output:
 - If payment create fails, confirm the rental order first and make sure you are using the customer's token.
 - If review creation fails, return the gear first and then retry the review request.
 
+### Endpoint Quick Reference
+
+| Area | Method | Path |
+|---|---|---|
+| Auth | POST | `/auth/login` |
+| Auth | POST | `/auth/register` |
+| Auth | GET | `/auth/me` |
+| Categories | GET | `/categories` |
+| Categories | POST | `/categories` |
+| Gear | GET | `/gear` |
+| Gear | POST | `/provider/gear` |
+| Gear | GET | `/gear/:id` |
+| Gear | PUT | `/provider/gear/:id` |
+| Gear | DELETE | `/provider/gear/:id` |
+| Rentals | POST | `/rentals` |
+| Rentals | GET | `/rentals` |
+| Rentals | GET | `/provider/orders` |
+| Rentals | PATCH | `/provider/orders/:id` |
+| Payments | POST | `/payments/create` |
+| Payments | POST | `/payments/confirm` |
+| Payments | GET | `/payments` |
+| Reviews | POST | `/reviews` |
+| Admin | GET | `/admin/users` |
+| Admin | PATCH | `/admin/users/:id` |
+| Admin | GET | `/admin/gear` |
+| Admin | GET | `/admin/rentals` |
+
 ### Main API Groups
 
 - `/api/auth`
