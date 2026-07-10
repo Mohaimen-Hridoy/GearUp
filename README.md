@@ -517,6 +517,108 @@ Expected output:
 }
 ```
 
+### Thunder Client Admin Review And Error Flow
+
+1. `POST /reviews`
+
+Customer input:
+
+```json
+{
+   "gearItemId": "GEAR_ID",
+   "rating": 5,
+   "comment": "Very good gear"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Review created successfully",
+   "data": {
+      "id": "REVIEW_ID",
+      "rating": 5,
+      "comment": "Very good gear"
+   }
+}
+```
+
+2. `GET /admin/users`
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Users retrieved successfully",
+   "data": []
+}
+```
+
+3. `PATCH /admin/users/:id`
+
+Admin input:
+
+```json
+{
+   "status": "SUSPENDED"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "User status updated successfully",
+   "data": {
+      "id": "CUSTOMER_ID",
+      "status": "SUSPENDED"
+   }
+}
+```
+
+4. `GET /admin/gear`
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "All gear retrieved successfully",
+   "data": []
+}
+```
+
+5. `GET /admin/rentals`
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "All rental orders retrieved successfully",
+   "data": []
+}
+```
+
+6. Error response pattern
+
+```json
+{
+   "success": false,
+   "message": "Validation failed",
+   "errorDetails": [
+      {
+         "path": "body.email",
+         "message": "Valid email is required"
+      }
+   ]
+}
+```
+
 ### Main API Groups
 
 - `/api/auth`
