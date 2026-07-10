@@ -412,6 +412,111 @@ Expected output:
 }
 ```
 
+### Thunder Client Rental And Payment Flow
+
+1. `POST /rentals`
+
+Customer input:
+
+```json
+{
+   "gearItemId": "GEAR_ID",
+   "startDate": "2026-07-12T10:00:00.000Z",
+   "endDate": "2026-07-15T10:00:00.000Z"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Rental order created successfully",
+   "data": {
+      "id": "RENTAL_ORDER_ID",
+      "status": "PLACED",
+      "totalPrice": "1200.00"
+   }
+}
+```
+
+2. `PATCH /provider/orders/:id` with `CONFIRMED`
+
+Provider input:
+
+```json
+{
+   "status": "CONFIRMED"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Rental order status updated successfully",
+   "data": {
+      "id": "RENTAL_ORDER_ID",
+      "status": "CONFIRMED"
+   }
+}
+```
+
+3. `POST /payments/create`
+
+Customer input:
+
+```json
+{
+   "rentalOrderId": "RENTAL_ORDER_ID"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Payment created successfully",
+   "data": {
+      "payment": {
+         "id": "PAYMENT_ID",
+         "rentalOrderId": "RENTAL_ORDER_ID",
+         "status": "PENDING",
+         "paymentIntentId": "PAYMENT_INTENT_ID"
+      },
+      "clientSecret": "...",
+      "isGatewayConfigured": true
+   }
+}
+```
+
+4. `POST /payments/confirm`
+
+Customer input:
+
+```json
+{
+   "rentalOrderId": "RENTAL_ORDER_ID",
+   "paymentIntentId": "PAYMENT_INTENT_ID"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Payment confirmed successfully",
+   "data": {
+      "id": "PAYMENT_ID",
+      "status": "COMPLETED",
+      "paidAt": "..."
+   }
+}
+```
+
 ### Main API Groups
 
 - `/api/auth`
