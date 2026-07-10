@@ -688,6 +688,17 @@ Expected output:
 12. Create review.
 13. Verify admin views.
 
+### Saved Value Map
+
+| Step | Save This |
+|---|---|
+| Login | `ADMIN_TOKEN`, `PROVIDER_TOKEN`, `CUSTOMER_TOKEN` |
+| Category create | `CATEGORY_ID` |
+| Gear create | `GEAR_ID` |
+| Rental create | `RENTAL_ORDER_ID` |
+| Payment create | `PAYMENT_ID`, `PAYMENT_INTENT_ID` |
+| Review create | no new id required for next step |
+
 ### Main API Groups
 
 - `/api/auth`
