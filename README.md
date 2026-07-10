@@ -236,6 +236,81 @@ Save these IDs as you test:
 - `PAYMENT_ID`
 - `PAYMENT_INTENT_ID`
 
+### Thunder Client Auth Flow
+
+1. `POST /auth/login`
+
+Admin input:
+
+```json
+{
+   "email": "admin@gearup.com",
+   "password": "Admin@12345"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Login successful",
+   "data": {
+      "token": "JWT_TOKEN",
+      "user": {
+         "id": "ADMIN_ID",
+         "name": "GearUp Admin",
+         "email": "admin@gearup.com",
+         "role": "ADMIN",
+         "status": "ACTIVE"
+      }
+   }
+}
+```
+
+2. `POST /auth/register`
+
+Provider input:
+
+```json
+{
+   "name": "Shawon",
+   "email": "shawon@example.com",
+   "password": "12345678",
+   "role": "PROVIDER"
+}
+```
+
+Customer input:
+
+```json
+{
+   "name": "Rahim Uddin",
+   "email": "rahim@example.com",
+   "password": "12345678",
+   "role": "CUSTOMER"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Registration successful",
+   "data": {
+      "user": {
+         "id": "USER_ID",
+         "name": "...",
+         "email": "...",
+         "role": "PROVIDER",
+         "status": "ACTIVE"
+      },
+      "token": "JWT_TOKEN"
+   }
+}
+```
+
 ### Main API Groups
 
 - `/api/auth`
