@@ -184,6 +184,39 @@ OpenAPI JSON is available at:
 /api/docs
 ```
 
+### Thunder Client Test Flow
+
+Use this sequence in Thunder Client with `http://localhost:5000/api` as the base URL:
+
+1. `POST /auth/login` as admin
+2. `POST /auth/register` as provider
+3. `POST /auth/register` as customer
+4. `POST /categories` as admin
+5. `POST /provider/gear` as provider
+6. `GET /gear`
+7. `POST /rentals` as customer
+8. `PATCH /provider/orders/:id` as provider with `CONFIRMED`
+9. `POST /payments/create` as customer
+10. `POST /payments/confirm` as customer
+11. `PATCH /provider/orders/:id` as provider with `PICKED_UP`
+12. `PATCH /provider/orders/:id` as provider with `RETURNED`
+13. `POST /reviews` as customer
+14. `GET /admin/users`
+15. `GET /admin/gear`
+16. `GET /admin/rentals`
+17. `GET /docs`
+
+Save the returned IDs in order:
+
+- `ADMIN_TOKEN`
+- `PROVIDER_TOKEN`
+- `CUSTOMER_TOKEN`
+- `CATEGORY_ID`
+- `GEAR_ID`
+- `RENTAL_ORDER_ID`
+- `PAYMENT_ID`
+- `PAYMENT_INTENT_ID`
+
 ### Main API Groups
 
 - `/api/auth`
