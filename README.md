@@ -311,6 +311,107 @@ Expected output:
 }
 ```
 
+### Thunder Client Category And Gear Flow
+
+1. `POST /categories`
+
+Admin input:
+
+```json
+{
+   "name": "Camping",
+   "slug": "camping"
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Category created successfully",
+   "data": {
+      "id": "CATEGORY_ID",
+      "name": "Camping",
+      "slug": "camping"
+   }
+}
+```
+
+2. `POST /provider/gear`
+
+Provider input:
+
+```json
+{
+   "title": "Camping Tent",
+   "description": "4 person tent",
+   "brand": "Decathlon",
+   "categoryId": "CATEGORY_ID",
+   "pricePerDay": 250,
+   "stock": 5,
+   "isAvailable": true
+}
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Gear created successfully",
+   "data": {
+      "id": "GEAR_ID",
+      "title": "Camping Tent",
+      "brand": "Decathlon",
+      "categoryId": "CATEGORY_ID"
+   }
+}
+```
+
+3. `GET /gear`
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Gear list retrieved successfully",
+   "data": [
+      {
+         "id": "GEAR_ID",
+         "title": "Camping Tent",
+         "brand": "Decathlon"
+      }
+   ]
+}
+```
+
+4. `GET /gear/:id`
+
+Example:
+
+```text
+GET /gear/GEAR_ID
+```
+
+Expected output:
+
+```json
+{
+   "success": true,
+   "message": "Gear details retrieved successfully",
+   "data": {
+      "id": "GEAR_ID",
+      "title": "Camping Tent",
+      "category": {
+         "id": "CATEGORY_ID",
+         "name": "Camping"
+      }
+   }
+}
+```
+
 ### Main API Groups
 
 - `/api/auth`
