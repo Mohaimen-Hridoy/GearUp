@@ -217,6 +217,25 @@ Save the returned IDs in order:
 - `PAYMENT_ID`
 - `PAYMENT_INTENT_ID`
 
+### Thunder Client Setup
+
+Use these shared values in every request:
+
+- Base URL: `http://localhost:5000/api`
+- `Content-Type: application/json`
+- Protected routes: `Authorization: Bearer <TOKEN>`
+
+Save these IDs as you test:
+
+- `ADMIN_TOKEN`
+- `PROVIDER_TOKEN`
+- `CUSTOMER_TOKEN`
+- `CATEGORY_ID`
+- `GEAR_ID`
+- `RENTAL_ORDER_ID`
+- `PAYMENT_ID`
+- `PAYMENT_INTENT_ID`
+
 ### Main API Groups
 
 - `/api/auth`
