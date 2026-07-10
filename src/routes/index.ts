@@ -17,6 +17,8 @@ router.use("/rentals", rentalRoutes);
 router.use("/payments", paymentRoutes);
 router.use("/reviews", reviewRoutes);
 router.use("/admin", adminRoutes);
+router.use("/provider/gear", gearRoutes);
+router.use("/provider/orders", rentalRoutes);
 router.use("/docs", docsRoutes);
 
 export const apiRoutes = router;

@@ -47,7 +47,16 @@ export const openApiSpec = {
       get: { tags: ["Gear"], summary: "Get all gear with filters" },
       post: { tags: ["Gear"], summary: "Create gear", security: [{ bearerAuth: [] }] },
     },
+    "/provider/gear": {
+      get: { tags: ["Gear"], summary: "Get all gear with filters" },
+      post: { tags: ["Gear"], summary: "Create gear", security: [{ bearerAuth: [] }] },
+    },
     "/gear/{id}": {
+      get: { tags: ["Gear"], summary: "Get gear by id" },
+      put: { tags: ["Gear"], summary: "Update gear", security: [{ bearerAuth: [] }] },
+      delete: { tags: ["Gear"], summary: "Delete gear", security: [{ bearerAuth: [] }] },
+    },
+    "/provider/gear/{id}": {
       get: { tags: ["Gear"], summary: "Get gear by id" },
       put: { tags: ["Gear"], summary: "Update gear", security: [{ bearerAuth: [] }] },
       delete: { tags: ["Gear"], summary: "Delete gear", security: [{ bearerAuth: [] }] },
@@ -56,7 +65,15 @@ export const openApiSpec = {
       get: { tags: ["Rentals"], summary: "Get rentals" },
       post: { tags: ["Rentals"], summary: "Create rental", security: [{ bearerAuth: [] }] },
     },
+    "/provider/orders": {
+      get: { tags: ["Rentals"], summary: "Get rentals" },
+      post: { tags: ["Rentals"], summary: "Create rental", security: [{ bearerAuth: [] }] },
+    },
     "/rentals/{id}": {
+      get: { tags: ["Rentals"], summary: "Get rental by id", security: [{ bearerAuth: [] }] },
+      patch: { tags: ["Rentals"], summary: "Update rental status", security: [{ bearerAuth: [] }] },
+    },
+    "/provider/orders/{id}": {
       get: { tags: ["Rentals"], summary: "Get rental by id", security: [{ bearerAuth: [] }] },
       patch: { tags: ["Rentals"], summary: "Update rental status", security: [{ bearerAuth: [] }] },
     },
