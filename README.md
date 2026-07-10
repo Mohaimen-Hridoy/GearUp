@@ -619,6 +619,16 @@ Expected output:
 }
 ```
 
+### Thunder Client Status Guide
+
+- `200`: successful read or update
+- `201`: successful create
+- `400`: invalid input or validation failure
+- `401`: missing or invalid token
+- `403`: forbidden by role or ownership
+- `404`: resource not found
+- `409`: duplicate or conflict
+
 ### Main API Groups
 
 - `/api/auth`
