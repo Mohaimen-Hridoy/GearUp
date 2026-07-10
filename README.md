@@ -721,6 +721,14 @@ Successful requests usually look like this:
 
 The exact `data` shape changes by endpoint, but `success` should always be `true`.
 
+### Request Body Notes
+
+- Use JSON for every write request.
+- `categoryId`, `gearItemId`, `rentalOrderId`, and `paymentIntentId` must be the saved IDs from earlier responses.
+- `pricePerDay`, `stock`, and `rating` should be sent as numbers.
+- `startDate` and `endDate` should be ISO strings.
+- Do not send a slug where an ID is required.
+
 ### Main API Groups
 
 - `/api/auth`
