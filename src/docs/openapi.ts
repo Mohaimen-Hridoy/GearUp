@@ -1,111 +1,209 @@
+// OpenAPI documentation for GearUp API
+// This describes every route in the app: what it does, what you send, and what you get back.
+
 export const openApiSpec = {
-  openapi: "3.0.3",
+  openapi: "3.0.0",
   info: {
     title: "GearUp API",
     version: "1.0.0",
-    description: "OpenAPI documentation for the GearUp backend assignment.",
+    description:
+      "Backend API for renting sports & outdoor gear. There are 3 roles: CUSTOMER, PROVIDER, ADMIN. All errors are returned as { success: false, message, errorDetails }.",
   },
   servers: [{ url: "/api" }],
-  tags: [
-    { name: "Auth" },
-    { name: "Categories" },
-    { name: "Gear" },
-    { name: "Rentals" },
-    { name: "Payments" },
-    { name: "Reviews" },
-    { name: "Admin" },
-    { name: "Docs" },
-  ],
-  components: {
-    securitySchemes: {
-      bearerAuth: {
-        type: "http",
-        scheme: "bearer",
-        bearerFormat: "JWT",
-      },
-    },
-  },
   paths: {
     "/auth/register": {
-      post: { tags: ["Auth"], summary: "Register a new user" },
-    },
-    "/auth/login": {
-      post: { tags: ["Auth"], summary: "Login user" },
-    },
-    "/auth/me": {
-      get: { tags: ["Auth"], summary: "Get current user", security: [{ bearerAuth: [] }] },
-    },
-    "/categories": {
-      get: { tags: ["Categories"], summary: "Get all categories" },
       post: {
-        tags: ["Categories"],
-        summary: "Create category",
-        security: [{ bearerAuth: [] }],
+        summary: "Register a new user (customer or provider)",
+        requestBody: {
+          example: {
+            name: "Rahim Uddin",
+            email: "rahim@example.com",
+            password: "12345678",
+            role: "CUSTOMER",
+          },
+        },
+        responses: {
+          "201": { description: "User created, returns JWT token + user info" },
+          "400": { description: "Validation error" },
+          "409": { description: "Email already used" },
+        },
       },
     },
-    "/gear": {
-      get: { tags: ["Gear"], summary: "Get all gear with filters" },
-      post: { tags: ["Gear"], summary: "Create gear", security: [{ bearerAuth: [] }] },
+    "/auth/login": {
+      post: {
+        summary: "Login with email and password",
+        requestBody: {
+          example: { email: "rahim@example.com", password: "12345678" },
+        },
+        responses: {
+          "200": { description: "Returns JWT token + user info" },
+          "401": { description: "Wrong email or password" },
+        },
+      },
     },
-    "/provider/gear": {
-      get: { tags: ["Gear"], summary: "Get all gear with filters" },
-      post: { tags: ["Gear"], summary: "Create gear", security: [{ bearerAuth: [] }] },
+    "/auth/me": {
+      get: {
+        summary: "Get logged-in user's own info",
+        security: [{ bearerAuth: [] }],
+        responses: { "200": { description: "Current user" } },
+      },
+    },
+
+    "/categories": {
+      get: {
+        summary: "Get all gear categories (public)",
+        responses: { "200": { description: "List of categories" } },
+      },
+      post: {
+        summary: "Create a category (admin only)",
+        security: [{ bearerAuth: [] }],
+        requestBody: { example: { name: "Camping", slug: "camping" } },
+        responses: { "201": { description: "Category created" } },
+      },
+    },
+
+    "/gear": {
+      get: {
+        summary: "Get all gear, can filter by category/brand/price (public)",
+        responses: { "200": { description: "List of gear items" } },
+      },
+      post: {
+        summary: "Add new gear (provider only)",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          example: {
+            title: "Camping Tent",
+            brand: "Decathlon",
+            categoryId: "some-category-id",
+            pricePerDay: 250,
+            stock: 5,
+          },
+        },
+        responses: { "201": { description: "Gear created" } },
+      },
     },
     "/gear/{id}": {
-      get: { tags: ["Gear"], summary: "Get gear by id" },
-      put: { tags: ["Gear"], summary: "Update gear", security: [{ bearerAuth: [] }] },
-      delete: { tags: ["Gear"], summary: "Delete gear", security: [{ bearerAuth: [] }] },
+      get: {
+        summary: "Get one gear item by id",
+        responses: { "200": { description: "Gear details" }, "404": { description: "Not found" } },
+      },
+      put: {
+        summary: "Update gear (only the provider who owns it)",
+        security: [{ bearerAuth: [] }],
+        responses: { "200": { description: "Gear updated" } },
+      },
+      delete: {
+        summary: "Delete gear (only the provider who owns it)",
+        security: [{ bearerAuth: [] }],
+        responses: { "200": { description: "Gear deleted" } },
+      },
+    },
+    "/provider/gear": {
+      get: { summary: "Same as GET /gear (provider-facing alias)", responses: { "200": { description: "List of gear" } } },
+      post: { summary: "Same as POST /gear", security: [{ bearerAuth: [] }], responses: { "201": { description: "Gear created" } } },
     },
     "/provider/gear/{id}": {
-      get: { tags: ["Gear"], summary: "Get gear by id" },
-      put: { tags: ["Gear"], summary: "Update gear", security: [{ bearerAuth: [] }] },
-      delete: { tags: ["Gear"], summary: "Delete gear", security: [{ bearerAuth: [] }] },
+      get: { summary: "Same as GET /gear/{id}", responses: { "200": { description: "Gear details" } } },
+      put: { summary: "Same as PUT /gear/{id}", security: [{ bearerAuth: [] }], responses: { "200": { description: "Gear updated" } } },
+      delete: { summary: "Same as DELETE /gear/{id}", security: [{ bearerAuth: [] }], responses: { "200": { description: "Gear deleted" } } },
     },
+
     "/rentals": {
-      get: { tags: ["Rentals"], summary: "Get rentals" },
-      post: { tags: ["Rentals"], summary: "Create rental", security: [{ bearerAuth: [] }] },
-    },
-    "/provider/orders": {
-      get: { tags: ["Rentals"], summary: "Get rentals" },
-      post: { tags: ["Rentals"], summary: "Create rental", security: [{ bearerAuth: [] }] },
+      get: {
+        summary: "Get rental orders (customer sees own, provider sees theirs, admin sees all)",
+        security: [{ bearerAuth: [] }],
+        responses: { "200": { description: "List of rental orders" } },
+      },
+      post: {
+        summary: "Create a rental order (customer only)",
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          example: {
+            gearItemId: "some-gear-id",
+            startDate: "2026-07-12T10:00:00.000Z",
+            endDate: "2026-07-15T10:00:00.000Z",
+          },
+        },
+        responses: { "201": { description: "Rental order created" } },
+      },
     },
     "/rentals/{id}": {
-      get: { tags: ["Rentals"], summary: "Get rental by id", security: [{ bearerAuth: [] }] },
-      patch: { tags: ["Rentals"], summary: "Update rental status", security: [{ bearerAuth: [] }] },
+      get: { summary: "Get one rental order by id", security: [{ bearerAuth: [] }], responses: { "200": { description: "Rental order details" } } },
+      patch: {
+        summary: "Update rental order status (provider who owns the gear)",
+        security: [{ bearerAuth: [] }],
+        requestBody: { example: { status: "CONFIRMED" } },
+        responses: { "200": { description: "Status updated" } },
+      },
+    },
+    "/provider/orders": {
+      get: { summary: "Same as GET /rentals", security: [{ bearerAuth: [] }], responses: { "200": { description: "List of rental orders" } } },
     },
     "/provider/orders/{id}": {
-      get: { tags: ["Rentals"], summary: "Get rental by id", security: [{ bearerAuth: [] }] },
-      patch: { tags: ["Rentals"], summary: "Update rental status", security: [{ bearerAuth: [] }] },
+      get: { summary: "Same as GET /rentals/{id}", security: [{ bearerAuth: [] }], responses: { "200": { description: "Rental order details" } } },
+      patch: { summary: "Same as PATCH /rentals/{id}", security: [{ bearerAuth: [] }], responses: { "200": { description: "Status updated" } } },
     },
+
     "/payments/create": {
-      post: { tags: ["Payments"], summary: "Create payment intent/session", security: [{ bearerAuth: [] }] },
+      post: {
+        summary: "Create a Stripe payment for a rental order (customer only)",
+        security: [{ bearerAuth: [] }],
+        requestBody: { example: { rentalOrderId: "some-rental-id" } },
+        responses: {
+          "201": { description: "Payment created, returns Stripe clientSecret" },
+          "500": { description: "Stripe is not configured on the server" },
+        },
+      },
     },
     "/payments/confirm": {
-      post: { tags: ["Payments"], summary: "Confirm payment", security: [{ bearerAuth: [] }] },
+      post: {
+        summary: "Confirm a Stripe payment and mark the order as PAID",
+        security: [{ bearerAuth: [] }],
+        requestBody: { example: { rentalOrderId: "some-rental-id", paymentIntentId: "pi_xxx" } },
+        responses: { "200": { description: "Payment confirmed" }, "400": { description: "Payment not successful yet" } },
+      },
     },
     "/payments": {
-      get: { tags: ["Payments"], summary: "Get payment history", security: [{ bearerAuth: [] }] },
+      get: {
+        summary: "Get payment history",
+        security: [{ bearerAuth: [] }],
+        responses: { "200": { description: "List of payments" } },
+      },
     },
     "/payments/{id}": {
-      get: { tags: ["Payments"], summary: "Get payment details", security: [{ bearerAuth: [] }] },
+      get: { summary: "Get one payment by id", security: [{ bearerAuth: [] }], responses: { "200": { description: "Payment details" } } },
     },
+
     "/reviews": {
-      post: { tags: ["Reviews"], summary: "Create review", security: [{ bearerAuth: [] }] },
+      post: {
+        summary: "Leave a review for gear you've returned (customer only)",
+        security: [{ bearerAuth: [] }],
+        requestBody: { example: { gearItemId: "some-gear-id", rating: 5, comment: "Very good gear" } },
+        responses: { "201": { description: "Review created" }, "400": { description: "You haven't returned this gear yet" } },
+      },
     },
+
     "/admin/users": {
-      get: { tags: ["Admin"], summary: "Get all users", security: [{ bearerAuth: [] }] },
+      get: { summary: "Get all users (admin only)", security: [{ bearerAuth: [] }], responses: { "200": { description: "List of users" } } },
     },
     "/admin/users/{id}": {
-      patch: { tags: ["Admin"], summary: "Update user status", security: [{ bearerAuth: [] }] },
+      patch: {
+        summary: "Suspend or activate a user (admin only)",
+        security: [{ bearerAuth: [] }],
+        requestBody: { example: { status: "SUSPENDED" } },
+        responses: { "200": { description: "User status updated" } },
+      },
     },
     "/admin/gear": {
-      get: { tags: ["Admin"], summary: "Get all gear", security: [{ bearerAuth: [] }] },
+      get: { summary: "Get all gear listings (admin only)", security: [{ bearerAuth: [] }], responses: { "200": { description: "List of gear" } } },
     },
     "/admin/rentals": {
-      get: { tags: ["Admin"], summary: "Get all rentals", security: [{ bearerAuth: [] }] },
+      get: { summary: "Get all rental orders (admin only)", security: [{ bearerAuth: [] }], responses: { "200": { description: "List of rental orders" } } },
     },
-    "/docs": {
-      get: { tags: ["Docs"], summary: "Get OpenAPI specification" },
+  },
+  components: {
+    securitySchemes: {
+      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
     },
   },
 } as const;
