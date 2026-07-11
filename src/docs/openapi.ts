@@ -1,468 +1,209 @@
+// OpenAPI documentation for GearUp API
+// This describes every route in the app: what it does, what you send, and what you get back.
+
 export const openApiSpec = {
-  openapi: "3.0.3",
+  openapi: "3.0.0",
   info: {
     title: "GearUp API",
     version: "1.0.0",
     description:
-      "Sports & outdoor gear rental backend. Three roles: CUSTOMER, PROVIDER, ADMIN. All error responses use { success: false, message, errorDetails }.",
+      "Backend API for renting sports & outdoor gear. There are 3 roles: CUSTOMER, PROVIDER, ADMIN. All errors are returned as { success: false, message, errorDetails }.",
   },
   servers: [{ url: "/api" }],
-  tags: [
-    { name: "Auth" },
-    { name: "Categories" },
-    { name: "Gear" },
-    { name: "Rentals" },
-    { name: "Payments" },
-    { name: "Reviews" },
-    { name: "Admin" },
-    { name: "Docs" },
-  ],
-  components: {
-    securitySchemes: {
-      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
-    },
-    schemas: {
-      ErrorResponse: {
-        type: "object",
-        properties: {
-          success: { type: "boolean", example: false },
-          message: { type: "string" },
-          errorDetails: { nullable: true },
-        },
-      },
-      User: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          name: { type: "string" },
-          email: { type: "string", format: "email" },
-          role: { type: "string", enum: ["CUSTOMER", "PROVIDER", "ADMIN"] },
-          status: { type: "string", enum: ["ACTIVE", "SUSPENDED"] },
-        },
-      },
-      RegisterRequest: {
-        type: "object",
-        required: ["name", "email", "password", "role"],
-        properties: {
-          name: { type: "string", example: "Rahim Uddin" },
-          email: { type: "string", format: "email", example: "rahim@example.com" },
-          password: { type: "string", minLength: 8, example: "12345678" },
-          role: { type: "string", enum: ["CUSTOMER", "PROVIDER"], example: "CUSTOMER" },
-        },
-      },
-      LoginRequest: {
-        type: "object",
-        required: ["email", "password"],
-        properties: {
-          email: { type: "string", format: "email" },
-          password: { type: "string" },
-        },
-      },
-      AuthResponse: {
-        type: "object",
-        properties: {
-          success: { type: "boolean", example: true },
-          message: { type: "string" },
-          data: {
-            type: "object",
-            properties: {
-              token: { type: "string" },
-              user: { $ref: "#/components/schemas/User" },
-            },
-          },
-        },
-      },
-      Category: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          name: { type: "string" },
-          slug: { type: "string" },
-        },
-      },
-      CategoryRequest: {
-        type: "object",
-        required: ["name", "slug"],
-        properties: {
-          name: { type: "string", example: "Camping" },
-          slug: { type: "string", example: "camping" },
-        },
-      },
-      GearItem: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          title: { type: "string" },
-          description: { type: "string", nullable: true },
-          brand: { type: "string" },
-          pricePerDay: { type: "string", example: "250.00" },
-          stock: { type: "integer" },
-          isAvailable: { type: "boolean" },
-          categoryId: { type: "string" },
-          providerId: { type: "string" },
-        },
-      },
-      GearCreateRequest: {
-        type: "object",
-        required: ["title", "brand", "categoryId", "pricePerDay", "stock"],
-        properties: {
-          title: { type: "string", example: "Camping Tent" },
-          description: { type: "string", example: "4 person tent" },
-          brand: { type: "string", example: "Decathlon" },
-          categoryId: { type: "string" },
-          pricePerDay: { type: "number", example: 250 },
-          stock: { type: "integer", example: 5 },
-          isAvailable: { type: "boolean", example: true },
-        },
-      },
-      RentalOrder: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          customerId: { type: "string" },
-          gearItemId: { type: "string" },
-          startDate: { type: "string", format: "date-time" },
-          endDate: { type: "string", format: "date-time" },
-          totalPrice: { type: "string", example: "1200.00" },
-          status: {
-            type: "string",
-            enum: ["PLACED", "CONFIRMED", "CANCELLED", "PAID", "PICKED_UP", "RETURNED"],
-          },
-        },
-      },
-      RentalCreateRequest: {
-        type: "object",
-        required: ["gearItemId", "startDate", "endDate"],
-        properties: {
-          gearItemId: { type: "string" },
-          startDate: { type: "string", format: "date-time" },
-          endDate: { type: "string", format: "date-time" },
-        },
-      },
-      RentalStatusUpdateRequest: {
-        type: "object",
-        required: ["status"],
-        properties: {
-          status: {
-            type: "string",
-            enum: ["CONFIRMED", "CANCELLED", "PICKED_UP", "RETURNED"],
-          },
-        },
-      },
-      Payment: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          transactionId: { type: "string" },
-          rentalOrderId: { type: "string" },
-          amount: { type: "string" },
-          provider: { type: "string", example: "stripe" },
-          status: { type: "string", enum: ["PENDING", "COMPLETED", "FAILED"] },
-          paymentIntentId: { type: "string", nullable: true },
-          paidAt: { type: "string", format: "date-time", nullable: true },
-        },
-      },
-      PaymentCreateRequest: {
-        type: "object",
-        required: ["rentalOrderId"],
-        properties: {
-          rentalOrderId: { type: "string" },
-        },
-      },
-      PaymentConfirmRequest: {
-        type: "object",
-        required: ["paymentIntentId"],
-        properties: {
-          rentalOrderId: { type: "string" },
-          transactionId: { type: "string" },
-          paymentIntentId: { type: "string" },
-        },
-      },
-      Review: {
-        type: "object",
-        properties: {
-          id: { type: "string" },
-          gearItemId: { type: "string" },
-          customerId: { type: "string" },
-          rating: { type: "integer", minimum: 1, maximum: 5 },
-          comment: { type: "string", nullable: true },
-        },
-      },
-      ReviewCreateRequest: {
-        type: "object",
-        required: ["gearItemId", "rating"],
-        properties: {
-          gearItemId: { type: "string" },
-          rating: { type: "integer", minimum: 1, maximum: 5, example: 5 },
-          comment: { type: "string", example: "Very good gear" },
-        },
-      },
-      UserStatusUpdateRequest: {
-        type: "object",
-        required: ["status"],
-        properties: {
-          status: { type: "string", enum: ["ACTIVE", "SUSPENDED"] },
-        },
-      },
-    },
-  },
   paths: {
     "/auth/register": {
       post: {
-        tags: ["Auth"],
         summary: "Register a new user (customer or provider)",
         requestBody: {
-          required: true,
-          content: { "application/json": { schema: { $ref: "#/components/schemas/RegisterRequest" } } },
+          example: {
+            name: "Rahim Uddin",
+            email: "rahim@example.com",
+            password: "12345678",
+            role: "CUSTOMER",
+          },
         },
         responses: {
-          "201": { description: "User registered", content: { "application/json": { schema: { $ref: "#/components/schemas/AuthResponse" } } } },
-          "400": { description: "Validation failed", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
-          "409": { description: "Email already registered", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          "201": { description: "User created, returns JWT token + user info" },
+          "400": { description: "Validation error" },
+          "409": { description: "Email already used" },
         },
       },
     },
     "/auth/login": {
       post: {
-        tags: ["Auth"],
-        summary: "Login and receive a JWT",
+        summary: "Login with email and password",
         requestBody: {
-          required: true,
-          content: { "application/json": { schema: { $ref: "#/components/schemas/LoginRequest" } } },
+          example: { email: "rahim@example.com", password: "12345678" },
         },
         responses: {
-          "200": { description: "Login successful", content: { "application/json": { schema: { $ref: "#/components/schemas/AuthResponse" } } } },
-          "401": { description: "Invalid credentials", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          "200": { description: "Returns JWT token + user info" },
+          "401": { description: "Wrong email or password" },
         },
       },
     },
     "/auth/me": {
       get: {
-        tags: ["Auth"],
-        summary: "Get current authenticated user",
+        summary: "Get logged-in user's own info",
         security: [{ bearerAuth: [] }],
-        responses: {
-          "200": { description: "Current user", content: { "application/json": { schema: { $ref: "#/components/schemas/User" } } } },
-          "401": { description: "Missing or invalid token", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
-        },
+        responses: { "200": { description: "Current user" } },
       },
     },
+
     "/categories": {
       get: {
-        tags: ["Categories"],
-        summary: "Get all gear categories",
-        responses: { "200": { description: "Category list", content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/Category" } } } } } },
+        summary: "Get all gear categories (public)",
+        responses: { "200": { description: "List of categories" } },
       },
       post: {
-        tags: ["Categories"],
-        summary: "Create category (Admin only)",
+        summary: "Create a category (admin only)",
         security: [{ bearerAuth: [] }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/CategoryRequest" } } } },
-        responses: {
-          "201": { description: "Category created", content: { "application/json": { schema: { $ref: "#/components/schemas/Category" } } } },
-          "403": { description: "Forbidden - admin only", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
-        },
+        requestBody: { example: { name: "Camping", slug: "camping" } },
+        responses: { "201": { description: "Category created" } },
       },
     },
+
     "/gear": {
       get: {
-        tags: ["Gear"],
-        summary: "Get all gear (public, filterable by category/price/brand)",
-        parameters: [
-          { name: "categoryId", in: "query", schema: { type: "string" } },
-          { name: "brand", in: "query", schema: { type: "string" } },
-          { name: "minPrice", in: "query", schema: { type: "number" } },
-          { name: "maxPrice", in: "query", schema: { type: "number" } },
-        ],
-        responses: { "200": { description: "Gear list", content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/GearItem" } } } } } },
+        summary: "Get all gear, can filter by category/brand/price (public)",
+        responses: { "200": { description: "List of gear items" } },
       },
       post: {
-        tags: ["Gear"],
-        summary: "Add gear to inventory (Provider only)",
+        summary: "Add new gear (provider only)",
         security: [{ bearerAuth: [] }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/GearCreateRequest" } } } },
-        responses: {
-          "201": { description: "Gear created", content: { "application/json": { schema: { $ref: "#/components/schemas/GearItem" } } } },
-          "403": { description: "Forbidden - provider only", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+        requestBody: {
+          example: {
+            title: "Camping Tent",
+            brand: "Decathlon",
+            categoryId: "some-category-id",
+            pricePerDay: 250,
+            stock: 5,
+          },
         },
-      },
-    },
-    "/provider/gear": {
-      get: { tags: ["Gear"], summary: "Alias of GET /gear", responses: { "200": { description: "Gear list" } } },
-      post: {
-        tags: ["Gear"],
-        summary: "Alias of POST /gear (Provider only)",
-        security: [{ bearerAuth: [] }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/GearCreateRequest" } } } },
         responses: { "201": { description: "Gear created" } },
       },
     },
     "/gear/{id}": {
       get: {
-        tags: ["Gear"],
-        summary: "Get gear details by id",
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: {
-          "200": { description: "Gear details", content: { "application/json": { schema: { $ref: "#/components/schemas/GearItem" } } } },
-          "404": { description: "Gear not found", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
-        },
+        summary: "Get one gear item by id",
+        responses: { "200": { description: "Gear details" }, "404": { description: "Not found" } },
       },
       put: {
-        tags: ["Gear"],
-        summary: "Update gear listing (owning Provider only)",
+        summary: "Update gear (only the provider who owns it)",
         security: [{ bearerAuth: [] }],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        requestBody: { content: { "application/json": { schema: { $ref: "#/components/schemas/GearCreateRequest" } } } },
         responses: { "200": { description: "Gear updated" } },
       },
       delete: {
-        tags: ["Gear"],
-        summary: "Remove gear from inventory (owning Provider only)",
+        summary: "Delete gear (only the provider who owns it)",
         security: [{ bearerAuth: [] }],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
         responses: { "200": { description: "Gear deleted" } },
       },
     },
-    "/provider/gear/{id}": {
-      get: { tags: ["Gear"], summary: "Alias of GET /gear/{id}", parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }], responses: { "200": { description: "Gear details" } } },
-      put: { tags: ["Gear"], summary: "Alias of PUT /gear/{id}", security: [{ bearerAuth: [] }], parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }], responses: { "200": { description: "Gear updated" } } },
-      delete: { tags: ["Gear"], summary: "Alias of DELETE /gear/{id}", security: [{ bearerAuth: [] }], parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }], responses: { "200": { description: "Gear deleted" } } },
+    "/provider/gear": {
+      get: { summary: "Same as GET /gear (provider-facing alias)", responses: { "200": { description: "List of gear" } } },
+      post: { summary: "Same as POST /gear", security: [{ bearerAuth: [] }], responses: { "201": { description: "Gear created" } } },
     },
+    "/provider/gear/{id}": {
+      get: { summary: "Same as GET /gear/{id}", responses: { "200": { description: "Gear details" } } },
+      put: { summary: "Same as PUT /gear/{id}", security: [{ bearerAuth: [] }], responses: { "200": { description: "Gear updated" } } },
+      delete: { summary: "Same as DELETE /gear/{id}", security: [{ bearerAuth: [] }], responses: { "200": { description: "Gear deleted" } } },
+    },
+
     "/rentals": {
       get: {
-        tags: ["Rentals"],
-        summary: "Get rental orders (scoped by role)",
+        summary: "Get rental orders (customer sees own, provider sees theirs, admin sees all)",
         security: [{ bearerAuth: [] }],
-        responses: { "200": { description: "Rental list", content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/RentalOrder" } } } } } },
+        responses: { "200": { description: "List of rental orders" } },
       },
       post: {
-        tags: ["Rentals"],
-        summary: "Create rental order (Customer only)",
+        summary: "Create a rental order (customer only)",
         security: [{ bearerAuth: [] }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/RentalCreateRequest" } } } },
-        responses: {
-          "201": { description: "Rental created", content: { "application/json": { schema: { $ref: "#/components/schemas/RentalOrder" } } } },
-          "400": { description: "Gear unavailable / validation failed", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+        requestBody: {
+          example: {
+            gearItemId: "some-gear-id",
+            startDate: "2026-07-12T10:00:00.000Z",
+            endDate: "2026-07-15T10:00:00.000Z",
+          },
         },
+        responses: { "201": { description: "Rental order created" } },
+      },
+    },
+    "/rentals/{id}": {
+      get: { summary: "Get one rental order by id", security: [{ bearerAuth: [] }], responses: { "200": { description: "Rental order details" } } },
+      patch: {
+        summary: "Update rental order status (provider who owns the gear)",
+        security: [{ bearerAuth: [] }],
+        requestBody: { example: { status: "CONFIRMED" } },
+        responses: { "200": { description: "Status updated" } },
       },
     },
     "/provider/orders": {
-      get: { tags: ["Rentals"], summary: "Alias of GET /rentals", security: [{ bearerAuth: [] }], responses: { "200": { description: "Rental list" } } },
-    },
-    "/rentals/{id}": {
-      get: {
-        tags: ["Rentals"],
-        summary: "Get rental order details",
-        security: [{ bearerAuth: [] }],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: { "200": { description: "Rental details" }, "404": { description: "Not found" } },
-      },
-      patch: {
-        tags: ["Rentals"],
-        summary: "Update rental order status (owning Provider only)",
-        security: [{ bearerAuth: [] }],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/RentalStatusUpdateRequest" } } } },
-        responses: { "200": { description: "Status updated" }, "403": { description: "Forbidden" } },
-      },
+      get: { summary: "Same as GET /rentals", security: [{ bearerAuth: [] }], responses: { "200": { description: "List of rental orders" } } },
     },
     "/provider/orders/{id}": {
-      get: { tags: ["Rentals"], summary: "Alias of GET /rentals/{id}", security: [{ bearerAuth: [] }], parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }], responses: { "200": { description: "Rental details" } } },
-      patch: { tags: ["Rentals"], summary: "Alias of PATCH /rentals/{id}", security: [{ bearerAuth: [] }], parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }], requestBody: { content: { "application/json": { schema: { $ref: "#/components/schemas/RentalStatusUpdateRequest" } } } }, responses: { "200": { description: "Status updated" } } },
+      get: { summary: "Same as GET /rentals/{id}", security: [{ bearerAuth: [] }], responses: { "200": { description: "Rental order details" } } },
+      patch: { summary: "Same as PATCH /rentals/{id}", security: [{ bearerAuth: [] }], responses: { "200": { description: "Status updated" } } },
     },
+
     "/payments/create": {
       post: {
-        tags: ["Payments"],
-        summary: "Create a Stripe payment intent for a rental order (Customer only)",
+        summary: "Create a Stripe payment for a rental order (customer only)",
         security: [{ bearerAuth: [] }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/PaymentCreateRequest" } } } },
+        requestBody: { example: { rentalOrderId: "some-rental-id" } },
         responses: {
-          "201": { description: "Payment intent created", content: { "application/json": { schema: { $ref: "#/components/schemas/Payment" } } } },
-          "500": { description: "Stripe not configured on the server", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
+          "201": { description: "Payment created, returns Stripe clientSecret" },
+          "500": { description: "Stripe is not configured on the server" },
         },
       },
     },
     "/payments/confirm": {
       post: {
-        tags: ["Payments"],
-        summary: "Confirm a Stripe payment intent and mark the order PAID",
+        summary: "Confirm a Stripe payment and mark the order as PAID",
         security: [{ bearerAuth: [] }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/PaymentConfirmRequest" } } } },
-        responses: {
-          "200": { description: "Payment confirmed", content: { "application/json": { schema: { $ref: "#/components/schemas/Payment" } } } },
-          "400": { description: "Payment intent not yet successful", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
-        },
+        requestBody: { example: { rentalOrderId: "some-rental-id", paymentIntentId: "pi_xxx" } },
+        responses: { "200": { description: "Payment confirmed" }, "400": { description: "Payment not successful yet" } },
       },
     },
     "/payments": {
       get: {
-        tags: ["Payments"],
-        summary: "Get payment history (scoped by role)",
+        summary: "Get payment history",
         security: [{ bearerAuth: [] }],
-        responses: { "200": { description: "Payment list", content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/Payment" } } } } } },
+        responses: { "200": { description: "List of payments" } },
       },
     },
     "/payments/{id}": {
-      get: {
-        tags: ["Payments"],
-        summary: "Get payment details by id",
-        security: [{ bearerAuth: [] }],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        responses: { "200": { description: "Payment details", content: { "application/json": { schema: { $ref: "#/components/schemas/Payment" } } } }, "403": { description: "Forbidden" } },
-      },
+      get: { summary: "Get one payment by id", security: [{ bearerAuth: [] }], responses: { "200": { description: "Payment details" } } },
     },
+
     "/reviews": {
       post: {
-        tags: ["Reviews"],
-        summary: "Create a review for gear that has been returned (Customer only)",
+        summary: "Leave a review for gear you've returned (customer only)",
         security: [{ bearerAuth: [] }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/ReviewCreateRequest" } } } },
-        responses: {
-          "201": { description: "Review created", content: { "application/json": { schema: { $ref: "#/components/schemas/Review" } } } },
-          "400": { description: "No returned rental found for this gear", content: { "application/json": { schema: { $ref: "#/components/schemas/ErrorResponse" } } } },
-        },
+        requestBody: { example: { gearItemId: "some-gear-id", rating: 5, comment: "Very good gear" } },
+        responses: { "201": { description: "Review created" }, "400": { description: "You haven't returned this gear yet" } },
       },
     },
+
     "/admin/users": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get all users (Admin only)",
-        security: [{ bearerAuth: [] }],
-        responses: { "200": { description: "User list", content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/User" } } } } } },
-      },
+      get: { summary: "Get all users (admin only)", security: [{ bearerAuth: [] }], responses: { "200": { description: "List of users" } } },
     },
     "/admin/users/{id}": {
       patch: {
-        tags: ["Admin"],
-        summary: "Suspend or activate a user (Admin only)",
+        summary: "Suspend or activate a user (admin only)",
         security: [{ bearerAuth: [] }],
-        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
-        requestBody: { required: true, content: { "application/json": { schema: { $ref: "#/components/schemas/UserStatusUpdateRequest" } } } },
-        responses: { "200": { description: "User status updated", content: { "application/json": { schema: { $ref: "#/components/schemas/User" } } } } },
+        requestBody: { example: { status: "SUSPENDED" } },
+        responses: { "200": { description: "User status updated" } },
       },
     },
     "/admin/gear": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get all gear listings (Admin only)",
-        security: [{ bearerAuth: [] }],
-        responses: { "200": { description: "Gear list", content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/GearItem" } } } } } },
-      },
+      get: { summary: "Get all gear listings (admin only)", security: [{ bearerAuth: [] }], responses: { "200": { description: "List of gear" } } },
     },
     "/admin/rentals": {
-      get: {
-        tags: ["Admin"],
-        summary: "Get all rental orders (Admin only)",
-        security: [{ bearerAuth: [] }],
-        responses: { "200": { description: "Rental list", content: { "application/json": { schema: { type: "array", items: { $ref: "#/components/schemas/RentalOrder" } } } } } },
-      },
+      get: { summary: "Get all rental orders (admin only)", security: [{ bearerAuth: [] }], responses: { "200": { description: "List of rental orders" } } },
     },
-    "/docs": {
-      get: {
-        tags: ["Docs"],
-        summary: "Get this OpenAPI specification as JSON",
-        responses: { "200": { description: "OpenAPI spec" } },
-      },
+  },
+  components: {
+    securitySchemes: {
+      bearerAuth: { type: "http", scheme: "bearer", bearerFormat: "JWT" },
     },
   },
 } as const;
