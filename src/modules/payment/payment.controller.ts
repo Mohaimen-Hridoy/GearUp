@@ -29,24 +29,26 @@ export const createPayment = catchAsync(async (req: Request, res: Response) => {
     throw new AppError(400, "Payment can be created only for placed or confirmed orders");
   }
 
+  if (!stripeClient) {
+    throw new AppError(
+      500,
+      "Payment gateway is not configured. Set STRIPE_SECRET_KEY to process real payments."
+    );
+  }
+
   const transactionId = order.payment?.transactionId ?? `txn_${Date.now()}`;
   const amount = Number(order.totalPrice.toString());
 
-  let paymentIntentId: string | null = order.payment?.paymentIntentId ?? null;
-  let clientSecret: string | null = null;
-
-  if (stripeClient) {
-    const paymentIntent = await stripeClient.paymentIntents.create({
-      amount: Math.round(amount * 100),
-      currency: "usd",
-      metadata: {
-        rentalOrderId: order.id,
-        customerId: order.customerId,
-      },
-    });
-    paymentIntentId = paymentIntent.id;
-    clientSecret = paymentIntent.client_secret;
-  }
+  const paymentIntent = await stripeClient.paymentIntents.create({
+    amount: Math.round(amount * 100),
+    currency: "usd",
+    metadata: {
+      rentalOrderId: order.id,
+      customerId: order.customerId,
+    },
+  });
+  const paymentIntentId: string = paymentIntent.id;
+  const clientSecret: string | null = paymentIntent.client_secret;
 
   const payment = await prisma.payment.upsert({
     where: { rentalOrderId: order.id },
@@ -72,7 +74,6 @@ export const createPayment = catchAsync(async (req: Request, res: Response) => {
     data: {
       payment,
       clientSecret,
-      isGatewayConfigured: Boolean(stripeClient),
     },
   });
 });

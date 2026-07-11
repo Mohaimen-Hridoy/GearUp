@@ -1,0 +1,355 @@
+{
+  "info": {
+    "name": "GearUp API",
+    "description": "Sports & outdoor gear rental backend. Set {{baseUrl}} to your local (http://localhost:5000/api) or deployed API URL. Login requests auto-save tokens to collection variables.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "adminToken", "value": "" },
+    { "key": "providerToken", "value": "" },
+    { "key": "customerToken", "value": "" },
+    { "key": "categoryId", "value": "" },
+    { "key": "gearId", "value": "" },
+    { "key": "rentalOrderId", "value": "" },
+    { "key": "paymentIntentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.data && data.data.token) { pm.collectionVariables.set('adminToken', data.data.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@gearup.com\",\n  \"password\": \"Admin@12345\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          }
+        },
+        {
+          "name": "Register Provider",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.data && data.data.token) { pm.collectionVariables.set('providerToken', data.data.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Shawon\",\n  \"email\": \"shawon@example.com\",\n  \"password\": \"12345678\",\n  \"role\": \"PROVIDER\"\n}" },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Register Customer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.data && data.data.token) { pm.collectionVariables.set('customerToken', data.data.token); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Rahim Uddin\",\n  \"email\": \"rahim@example.com\",\n  \"password\": \"12345678\",\n  \"role\": \"CUSTOMER\"\n}" },
+            "url": "{{baseUrl}}/auth/register"
+          }
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": "{{baseUrl}}/auth/me"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Create Category (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.data && data.data.id) { pm.collectionVariables.set('categoryId', data.data.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Camping\",\n  \"slug\": \"camping\"\n}" },
+            "url": "{{baseUrl}}/categories"
+          }
+        },
+        { "name": "Get Categories", "request": { "method": "GET", "url": "{{baseUrl}}/categories" } }
+      ]
+    },
+    {
+      "name": "Gear",
+      "item": [
+        {
+          "name": "Create Gear (Provider)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.data && data.data.id) { pm.collectionVariables.set('gearId', data.data.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{providerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"title\": \"Camping Tent\",\n  \"description\": \"4 person tent\",\n  \"brand\": \"Decathlon\",\n  \"categoryId\": \"{{categoryId}}\",\n  \"pricePerDay\": 250,\n  \"stock\": 5,\n  \"isAvailable\": true\n}" },
+            "url": "{{baseUrl}}/provider/gear"
+          }
+        },
+        { "name": "Get All Gear", "request": { "method": "GET", "url": "{{baseUrl}}/gear" } },
+        { "name": "Get Gear By Id", "request": { "method": "GET", "url": "{{baseUrl}}/gear/{{gearId}}" } },
+        {
+          "name": "Update Gear (Provider)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{providerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"stock\": 8\n}" },
+            "url": "{{baseUrl}}/provider/gear/{{gearId}}"
+          }
+        },
+        {
+          "name": "Delete Gear (Provider)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{providerToken}}" }],
+            "url": "{{baseUrl}}/provider/gear/{{gearId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Rentals",
+      "item": [
+        {
+          "name": "Create Rental (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.data && data.data.id) { pm.collectionVariables.set('rentalOrderId', data.data.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"gearItemId\": \"{{gearId}}\",\n  \"startDate\": \"2026-07-12T10:00:00.000Z\",\n  \"endDate\": \"2026-07-15T10:00:00.000Z\"\n}" },
+            "url": "{{baseUrl}}/rentals"
+          }
+        },
+        {
+          "name": "Get My Rentals",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": "{{baseUrl}}/rentals"
+          }
+        },
+        {
+          "name": "Confirm Rental (Provider)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{providerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"CONFIRMED\"\n}" },
+            "url": "{{baseUrl}}/provider/orders/{{rentalOrderId}}"
+          }
+        },
+        {
+          "name": "Mark Picked Up (Provider)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{providerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"PICKED_UP\"\n}" },
+            "url": "{{baseUrl}}/provider/orders/{{rentalOrderId}}"
+          }
+        },
+        {
+          "name": "Mark Returned (Provider)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{providerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"RETURNED\"\n}" },
+            "url": "{{baseUrl}}/provider/orders/{{rentalOrderId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment (Customer)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.data && data.data.payment) { pm.collectionVariables.set('paymentIntentId', data.data.payment.paymentIntentId); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"rentalOrderId\": \"{{rentalOrderId}}\"\n}" },
+            "url": "{{baseUrl}}/payments/create"
+          }
+        },
+        {
+          "name": "Confirm Payment (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"rentalOrderId\": \"{{rentalOrderId}}\",\n  \"paymentIntentId\": \"{{paymentIntentId}}\"\n}" },
+            "url": "{{baseUrl}}/payments/confirm"
+          }
+        },
+        {
+          "name": "Get My Payments",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{customerToken}}" }],
+            "url": "{{baseUrl}}/payments"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "Create Review (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{customerToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"gearItemId\": \"{{gearId}}\",\n  \"rating\": 5,\n  \"comment\": \"Very good gear\"\n}" },
+            "url": "{{baseUrl}}/reviews"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/users"
+          }
+        },
+        {
+          "name": "Suspend/Activate User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"SUSPENDED\"\n}" },
+            "url": "{{baseUrl}}/admin/users/REPLACE_USER_ID"
+          }
+        },
+        {
+          "name": "Get All Gear (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/gear"
+          }
+        },
+        {
+          "name": "Get All Rentals (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": "{{baseUrl}}/admin/rentals"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Docs",
+      "item": [
+        { "name": "Get OpenAPI Spec", "request": { "method": "GET", "url": "{{baseUrl}}/docs" } }
+      ]
+    }
+  ]
+}
