@@ -10,7 +10,6 @@ const envSchema = z.object({
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
   JWT_EXPIRES_IN: z.string().default("7d"),
   STRIPE_SECRET_KEY: z.string().optional(),
-  PAYMENT_PROVIDER: z.enum(["stripe", "sslcommerz"]).default("stripe"),
 });
 
 const parsed = envSchema.safeParse(process.env);

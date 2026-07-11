@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
 import { catchAsync } from "../../utils/catchAsync";
 import { AppError } from "../../utils/appError";
-import { env } from "../../config/env";
 import { stripeClient } from "../../config/stripe";
 
 export const createPayment = catchAsync(async (req: Request, res: Response) => {
@@ -36,7 +35,7 @@ export const createPayment = catchAsync(async (req: Request, res: Response) => {
   let paymentIntentId: string | null = order.payment?.paymentIntentId ?? null;
   let clientSecret: string | null = null;
 
-  if (env.PAYMENT_PROVIDER === "stripe" && stripeClient) {
+  if (stripeClient) {
     const paymentIntent = await stripeClient.paymentIntents.create({
       amount: Math.round(amount * 100),
       currency: "usd",
@@ -53,7 +52,7 @@ export const createPayment = catchAsync(async (req: Request, res: Response) => {
     where: { rentalOrderId: order.id },
     update: {
       amount,
-      provider: env.PAYMENT_PROVIDER,
+      provider: "stripe",
       status: PaymentStatus.PENDING,
       paymentIntentId,
     },
@@ -61,7 +60,7 @@ export const createPayment = catchAsync(async (req: Request, res: Response) => {
       rentalOrderId: order.id,
       transactionId,
       amount,
-      provider: env.PAYMENT_PROVIDER,
+      provider: "stripe",
       status: PaymentStatus.PENDING,
       paymentIntentId,
     },
@@ -99,11 +98,17 @@ export const confirmPayment = catchAsync(async (req: Request, res: Response) => 
     throw new AppError(404, "Payment not found");
   }
 
-  if (paymentIntentId && stripeClient) {
-    const intent = await stripeClient.paymentIntents.retrieve(paymentIntentId);
-    if (intent.status !== "succeeded") {
-      throw new AppError(400, "Stripe payment intent is not successful yet");
-    }
+  if (!paymentIntentId) {
+    throw new AppError(400, "paymentIntentId is required for Stripe confirmation");
+  }
+
+  if (!stripeClient) {
+    throw new AppError(500, "Stripe gateway is not configured");
+  }
+
+  const intent = await stripeClient.paymentIntents.retrieve(paymentIntentId);
+  if (intent.status !== "succeeded") {
+    throw new AppError(400, "Stripe payment intent is not successful yet");
   }
 
   const updatedPayment = await prisma.payment.update({

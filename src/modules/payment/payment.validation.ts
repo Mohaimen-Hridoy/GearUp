@@ -18,7 +18,7 @@ export const confirmPaymentSchema = z.object({
     .object({
       transactionId: z.string().min(1).optional(),
       rentalOrderId: cuidIdSchema.optional(),
-      paymentIntentId: z.string().min(1).optional(),
+      paymentIntentId: z.string().min(1, "paymentIntentId is required").optional(),
     })
     .refine((value) => value.transactionId || value.rentalOrderId, {
       message: "Either transactionId or rentalOrderId is required",
