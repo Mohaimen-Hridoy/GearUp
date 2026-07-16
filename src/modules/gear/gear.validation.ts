@@ -2,14 +2,17 @@ import { z } from "zod";
 
 export const cuidIdSchema = z.string().min(1, "ID is required").cuid("Invalid id format");
 
+const emptyToUndefined = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess((value) => (value === "" ? undefined : value), schema);
+
 export const getAllGearSchema = z.object({
   query: z
     .object({
-      categoryId: cuidIdSchema.optional(),
-      brand: z.string().min(1).optional(),
-      search: z.string().min(1).optional(),
-      minPrice: z.coerce.number().nonnegative().optional(),
-      maxPrice: z.coerce.number().nonnegative().optional(),
+      categoryId: emptyToUndefined(cuidIdSchema.optional()),
+      brand: emptyToUndefined(z.string().min(1).optional()),
+      search: emptyToUndefined(z.string().min(1).optional()),
+      minPrice: emptyToUndefined(z.coerce.number().nonnegative().optional()),
+      maxPrice: emptyToUndefined(z.coerce.number().nonnegative().optional()),
     })
     .superRefine((value, context) => {
       if (value.minPrice !== undefined && value.maxPrice !== undefined && value.minPrice > value.maxPrice) {
