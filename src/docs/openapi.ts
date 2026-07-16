@@ -1,6 +1,3 @@
-// OpenAPI documentation for GearUp API
-// This describes every route in the app: what it does, what you send, and what you get back.
-
 export const openApiSpec = {
   openapi: "3.0.0",
   info: {

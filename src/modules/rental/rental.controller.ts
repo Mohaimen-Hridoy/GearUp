@@ -39,8 +39,6 @@ export const createRental = catchAsync(async (req: Request, res: Response) => {
   const unitPrice = Number(gearItem.pricePerDay.toString());
   const totalPrice = rentalDays * unitPrice;
 
-  // Create the order and decrement stock atomically so the same unit
-  // cannot be rented more times than it is in stock.
   const rentalOrder = await prisma.$transaction(async (tx) => {
     const order = await tx.rentalOrder.create({
       data: {
@@ -175,8 +173,6 @@ export const updateRentalStatus = catchAsync(async (req: Request, res: Response)
 
   const { status } = req.body;
 
-  // When an order is cancelled or returned, the unit goes back to stock.
-  // Guard against restoring twice if the order is already in such a state.
   const stockReleasingStatuses: RentalOrderStatus[] = [
     RentalOrderStatus.CANCELLED,
     RentalOrderStatus.RETURNED,
