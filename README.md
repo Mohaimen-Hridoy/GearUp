@@ -45,18 +45,27 @@ https://gear-up-eta.vercel.app
 ## GitHub Repository
 
 ```
-https://github.com/YOUR_USERNAME/GearUp
+https://github.com/Mohaimen-Hridoy/GearUp
 ```
 
 ---
 
 ## API Documentation
 
+OpenAPI specification (served live):
+
 ```
 https://gear-up-eta.vercel.app/api/docs
 ```
 
-(If you are using Postman documentation instead, replace this link.)
+Postman collection (importable) is included in the repo at:
+
+```
+postman/GearUp.postman_collection.json
+```
+
+Import it into Postman, then run `Auth > Login (Admin)` first — the JWT token is
+saved automatically and reused by every protected request.
 
 ---
 
@@ -73,7 +82,7 @@ Paste your Google Drive/Loom video link here
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/GearUp.git
+git clone https://github.com/Mohaimen-Hridoy/GearUp.git
 ```
 
 Install dependencies

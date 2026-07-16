@@ -39,18 +39,33 @@ export const createRental = catchAsync(async (req: Request, res: Response) => {
   const unitPrice = Number(gearItem.pricePerDay.toString());
   const totalPrice = rentalDays * unitPrice;
 
-  const rentalOrder = await prisma.rentalOrder.create({
-    data: {
-      customerId: req.user.userId,
-      gearItemId,
-      startDate: start,
-      endDate: end,
-      totalPrice,
-      status: RentalOrderStatus.PLACED,
-    },
-    include: {
-      gearItem: true,
-    },
+  // Create the order and decrement stock atomically so the same unit
+  // cannot be rented more times than it is in stock.
+  const rentalOrder = await prisma.$transaction(async (tx) => {
+    const order = await tx.rentalOrder.create({
+      data: {
+        customerId: req.user!.userId,
+        gearItemId,
+        startDate: start,
+        endDate: end,
+        totalPrice,
+        status: RentalOrderStatus.PLACED,
+      },
+      include: {
+        gearItem: true,
+      },
+    });
+
+    const remainingStock = gearItem.stock - 1;
+    await tx.gearItem.update({
+      where: { id: gearItem.id },
+      data: {
+        stock: remainingStock,
+        isAvailable: remainingStock > 0,
+      },
+    });
+
+    return order;
   });
 
   res.status(201).json({
@@ -160,9 +175,34 @@ export const updateRentalStatus = catchAsync(async (req: Request, res: Response)
 
   const { status } = req.body;
 
-  const updated = await prisma.rentalOrder.update({
-    where: { id: rentalOrderId },
-    data: { status },
+  // When an order is cancelled or returned, the unit goes back to stock.
+  // Guard against restoring twice if the order is already in such a state.
+  const stockReleasingStatuses: RentalOrderStatus[] = [
+    RentalOrderStatus.CANCELLED,
+    RentalOrderStatus.RETURNED,
+  ];
+  const shouldReleaseStock =
+    stockReleasingStatuses.includes(status) &&
+    !stockReleasingStatuses.includes(rental.status);
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const updatedOrder = await tx.rentalOrder.update({
+      where: { id: rentalOrderId },
+      data: { status },
+    });
+
+    if (shouldReleaseStock) {
+      const restoredStock = rental.gearItem.stock + 1;
+      await tx.gearItem.update({
+        where: { id: rental.gearItemId },
+        data: {
+          stock: restoredStock,
+          isAvailable: restoredStock > 0,
+        },
+      });
+    }
+
+    return updatedOrder;
   });
 
   res.status(200).json({
