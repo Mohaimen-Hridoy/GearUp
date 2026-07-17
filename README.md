@@ -52,13 +52,19 @@ https://github.com/Mohaimen-Hridoy/GearUp
 
 ## API Documentation
 
+Published Postman documentation (public link):
+
+```
+https://documenter.getpostman.com/view/55052230/2sBY4Mw2SS
+```
+
 OpenAPI specification (served live):
 
 ```
 https://gear-up-eta.vercel.app/api/docs
 ```
 
-Postman collection (importable) is included in the repo at:
+Postman collection (importable) is also included in the repo at:
 
 ```
 postman/GearUp.postman_collection.json
@@ -126,11 +132,16 @@ Create a `.env` file using `.env.example`.
 Required variables:
 
 ```env
-DATABASE_URL=
-JWT_SECRET=
+NODE_ENV=development
+PORT=5000
+DATABASE_URL=postgresql://user:password@host:5432/gearup
+JWT_SECRET=super-secret-jwt-key
 JWT_EXPIRES_IN=7d
 STRIPE_SECRET_KEY=
 PAYMENT_PROVIDER=stripe
+ADMIN_EMAIL=admin@gearup.com
+ADMIN_PASSWORD=Admin@12345
+ADMIN_NAME=GearUp Admin
 ```
 
 ---
@@ -176,6 +187,7 @@ Admin@12345
 
 - POST /api/rentals
 - GET /api/rentals
+- GET /api/rentals/:id
 - GET /api/provider/orders
 - PATCH /api/provider/orders/:id
 
@@ -184,6 +196,7 @@ Admin@12345
 - POST /api/payments/create
 - POST /api/payments/confirm
 - GET /api/payments
+- GET /api/payments/:id
 
 ### Reviews
 
