@@ -78,7 +78,7 @@ saved automatically and reused by every protected request.
 ## Demo Video
 
 ```
-Paste your Google Drive/Loom video link here
+https://drive.google.com/file/d/17jyF8AiKWMRa5EbDgcMsfKpkF2pIxFz9/view?usp=sharing
 ```
 
 ---
